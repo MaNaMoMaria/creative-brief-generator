@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Maryam Design - Project Discovery Portal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root { --bg: #0D1117; --accent: #58a6ff; --card: #161b22; --text: #c9d1d9; --success: #238636; --error: #f85149; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .container { background: var(--card); padding: 35px; border-radius: 20px; width: 100%; max-width: 850px; border: 1px solid #30363d; box-shadow: 0 10px 50px rgba(0,0,0,0.5); }
+        .step { display: none; } .step.active { display: block; }
+        h2 { color: var(--accent); border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 20px; }
+        .option { background: #21262d; padding: 18px; margin: 10px 0; border-radius: 12px; cursor: pointer; display: flex; justify-content: space-between; border: 1px solid transparent; transition: 0.2s; }
+        .option.selected { border-color: var(--accent); background: rgba(88, 166, 255, 0.1); }
+        .option.selected::after { content: '✅'; }
+        .custom-input { width: 100%; padding: 12px; margin-top: 10px; background: #0d1117; border: 1px dashed #484f58; border-radius: 8px; color: #58a6ff; }
+        .palette-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-height: 350px; overflow-y: auto; padding: 15px; background: #0d1117; border-radius: 12px; }
+        .palette-card { background: #161b22; padding: 15px; border-radius: 12px; cursor: pointer; border: 2px solid transparent; }
+        .palette-card.selected { border-color: var(--accent); background: rgba(88, 166, 255, 0.15); }
+        .swatch-container { display: flex; height: 35px; border-radius: 8px; overflow: hidden; margin-top: 10px; }
+        .swatch { flex: 1; }
+        input, textarea { width: 100%; padding: 14px; margin: 10px 0; background: #0d1117; border: 1px solid #30363d; border-radius: 8px; color: white; box-sizing: border-box; }
+        .upload-box { background: #21262d; border: 2px dashed #484f58; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; }
+        .preview-area img { max-width: 100%; max-height: 150px; border-radius: 8px; margin-top: 10px; border: 2px solid var(--accent); display: none; }
+        .nav-ui { margin-top: 30px; text-align: center; border-top: 1px solid #30363d; padding-top: 20px; }
+        button { padding: 16px 24px; border-radius: 12px; font-weight: bold; cursor: pointer; border: none; font-size: 16px; min-width: 140px; }
+        .next { background: var(--accent); color: white; }
+        .back { background: #484f58; color: white; }
+        .final-btn { display: none; background: var(--success); color: white; }
+        #export-area { background: #0d1117; color: white; padding: 50px; width: 1000px; position: absolute; left: -9999px; }
+        .res-row { border-bottom: 1px solid #333; padding: 15px 0; font-size: 18px; }
+        .error-msg { color: var(--error); font-size: 14px; display: none; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <form id="mainForm">
+        <div class="step active" id="s1">
+            <h2>01. Identity Check</h2>
+            <input type="text" id="clientName" placeholder="Client/Studio Name *" required>
+            <input type="email" id="clientEmail" placeholder="Business Email *" required>
+            <div id="idError" class="error-msg">Please fill both Name and Email to proceed.</div>
+        </div>
+
+        <div class="step" id="s2"><h2>02. Dimension</h2><div class="option" onclick="tgl(this)">2D</div><div class="option" onclick="tgl(this)">3D</div><div class="option" onclick="tgl(this)">2.5D</div><input type="text" id="c2" class="custom-input" placeholder="Other Dimension requirements..."></div>
+        <div class="step" id="s3"><h2>03. Platforms</h2><div class="option" onclick="tgl(this)">Mobile</div><div class="option" onclick="tgl(this)">PC</div><div class="option" onclick="tgl(this)">Console</div><input type="text" id="c3" class="custom-input" placeholder="Other Platforms..."></div>
+        <div class="step" id="s4"><h2>04. Mobile OS</h2><div class="option" onclick="tgl(this)">Android</div><div class="option" onclick="tgl(this)">iOS</div><div class="option" onclick="tgl(this)">Universal (Both)</div><input type="text" id="c4" class="custom-input" placeholder="Specific OS requirements..."></div>
+        <div class="step" id="s5"><h2>05. Art Style</h2><div class="option" onclick="tgl(this)">Realistic</div><div class="option" onclick="tgl(this)">Stylized</div><div class="option" onclick="tgl(this)">Pixel Art</div><input type="text" id="c5" class="custom-input" placeholder="Other Art Styles..."></div>
+        <div class="step" id="s6"><h2>06. Genre</h2><div class="option" onclick="tgl(this)">Action</div><div class="option" onclick="tgl(this)">RPG</div><div class="option" onclick="tgl(this)">Puzzle</div><input type="text" id="c6" class="custom-input" placeholder="Other Genre..."></div>
+        <div class="step" id="s7"><h2>07. Monetization</h2><div class="option" onclick="tgl(this)">Free-to-Play</div><div class="option" onclick="tgl(this)">Premium</div><input type="text" id="c7" class="custom-input" placeholder="Notes on Monetization..."></div>
+        <div class="step" id="s8"><h2>08. Mood</h2><div class="option" onclick="tgl(this)">Dark</div><div class="option" onclick="tgl(this)">Bright</div><input type="text" id="c8" class="custom-input" placeholder="Describe the Mood..."></div>
+        <div class="step" id="s9"><h2>09. UI Complexity</h2><div class="option" onclick="tgl(this)">Minimalist</div><div class="option" onclick="tgl(this)">Standard AAA</div><input type="text" id="c9" class="custom-input" placeholder="UI Details..."></div>
+        <div class="step" id="s10"><h2>10. Animation</h2><div class="option" onclick="tgl(this)">Static</div><div class="option" onclick="tgl(this)">Fluid</div><input type="text" id="c10" class="custom-input" placeholder="Animation details..."></div>
+        <div class="step" id="s11"><h2>11. Typography</h2><div class="option" onclick="tgl(this)">Modern</div><div class="option" onclick="tgl(this)">Fantasy</div><input type="text" id="c11" class="custom-input" placeholder="Typeface preferences..."></div>
+        <div class="step" id="s12"><h2>12. Audio</h2><div class="option" onclick="tgl(this)">Minimal</div><div class="option" onclick="tgl(this)">Full Soundtrack</div><input type="text" id="c12" class="custom-input" placeholder="Sound effects/Music..."></div>
+        <div class="step" id="s13"><h2>13. Social</h2><div class="option" onclick="tgl(this)">Multiplayer</div><div class="option" onclick="tgl(this)">Single Player</div><input type="text" id="c13" class="custom-input" placeholder="Social features..."></div>
+
+        <div class="step" id="s14">
+            <h2>14. Color Palettes (30 Options)</h2>
+            <div class="palette-grid" id="pGrid"></div>
+            <input type="text" id="c14" class="custom-input" placeholder="Custom Hex codes or colors...">
+        </div>
+
+        <div class="step" id="s15">
+            <h2>15. Reference Assets</h2>
+            <div class="upload-box">Ref 1: <input type="file" accept="image/*" onchange="hdlImg(this, 'pv1')"><div id="pv1" class="preview-area"><img src=""></div></div>
+            <div class="upload-box">Ref 2: <input type="file" accept="image/*" onchange="hdlImg(this, 'pv2')"><div id="pv2" class="preview-area"><img src=""></div></div>
+            <div class="upload-box">Ref 3: <input type="file" accept="image/*" onchange="hdlImg(this, 'pv3')"><div id="pv3" class="preview-area"><img src=""></div></div>
+            <textarea id="finalNotes" placeholder="Any final thoughts?"></textarea>
+        </div>
+
+        <div class="nav-ui">
+            <div id="stepCounter" style="color:var(--accent); margin-bottom:10px;">Step 1 / 15</div>
+            <button type="button" class="back" id="btnB" onclick="mv(-1)" style="display:none">Back</button>
+            <button type="button" class="next" id="btnN" onclick="mv(1)">Next Step</button>
+            <button type="button" class="final-btn" id="btnD" onclick="genPNG()">Download Visual Brief</button>
+        </div>
+    </form>
+</div>
+
+<div id="export-area">
+    <h1 style="color:#58a6ff; font-size:40px;">Discovery Brief - Maryam Design</h1>
+    <p style="font-size:20px;">Client: <span id="outN"></span> | Date: <span id="outD"></span></p>
+    <div id="outRes"></div>
+    <div id="outImgs" style="display:flex; flex-wrap:wrap; gap:15px; margin-top:20px;"></div>
+</div>
+
+<script>
+    let curr = 1;
+    const pals = [
+        ["Cyber Neon", "#0D0221", "#0F084B", "#26408B", "#A6CFD5", "#00FFFF"],
+        ["Royal RPG", "#1A090D", "#3D0C11", "#D1A124", "#7B1113", "#EAD8A4"],
+        ["Candy Rush", "#FF9AA2", "#FFB7B2", "#FFDAC1", "#E2F0CB", "#B5EAD7"],
+        ["Horror Mist", "#050505", "#1A1A1B", "#4A4A4A", "#8B0000", "#2D0A0A"],
+        ["Retro 8-bit", "#000000", "#1D2B53", "#7E2553", "#008751", "#FFCCAA"],
+        ["Ocean Puzzle", "#012E40", "#024959", "#3CAEA3", "#F6D55C", "#ED553B"],
+        ["Cyber City", "#FCEE09", "#00FF9F", "#FF003C", "#2D2D2D", "#0D0D0D"],
+        ["High Fantasy", "#1E1A11", "#413328", "#7B6547", "#C9B08E", "#F1E5AC"],
+        ["Deep Forest", "#0B1D12", "#1E332D", "#4E6E5D", "#A2AD91", "#EDF1E4"],
+        ["Space Void", "#0B3D91", "#141B41", "#FC3D21", "#E2E2E2", "#FFFFFF"],
+        ["Sunset Action", "#2D132C", "#801336", "#C72C41", "#EE4540", "#F1D1B5"],
+        ["Gold & Slate", "#1B1B1B", "#2E4053", "#D4AF37", "#F4D03F", "#ABB2B9"],
+        ["Arctic Frost", "#E0F7FA", "#B2EBF2", "#80DEEA", "#4DD0E1", "#00838F"],
+        ["Steampunk", "#3D2B1F", "#634832", "#967259", "#D4A373", "#895E3C"],
+        ["Techno Blue", "#001219", "#005F73", "#0A9396", "#94D2BD", "#E9D8A6"],
+        ["Sleek Dark", "#121212", "#1F1F1F", "#2C2C2C", "#383838", "#00F0FF"],
+        ["Toxic Green", "#0D0D0D", "#1A1A1A", "#CCFF00", "#66FF00", "#333333"],
+        ["Solaris", "#FF9F1C", "#FFBF69", "#FFFFFF", "#CBF3F0", "#2EC4B6"],
+        ["Viking Cold", "#2E3440", "#3B4252", "#434C5E", "#88C0D0", "#ECEFF4"],
+        ["Midnight", "#141E30", "#243B55", "#BDC3C7", "#2C3E50", "#000000"],
+        ["Pastel Dream", "#FFB7B2", "#FFDAC1", "#E2F0CB", "#B5EAD7", "#C7CEEA"],
+        ["Volcano", "#3D0C02", "#8E0E00", "#1F1C18", "#FF4500", "#FFD700"],
+        ["Modern AAA", "#1B1F23", "#24292E", "#444D56", "#58A6FF", "#FFFFFF"],
+        ["Gothic Castle", "#0D0D0D", "#1F1F1F", "#4A4A4A", "#7E0000", "#DEDEDE"],
+        ["Safari", "#283618", "#606C38", "#FEFAE0", "#DDA15E", "#BC6C25"],
+        ["Vibrant Pop", "#FF5733", "#C70039", "#900C3F", "#581845", "#FFC300"],
+        ["Industrial", "#333533", "#242423", "#F5CB5C", "#E8EDDF", "#CFDBD5"],
+        ["Flamingo", "#F06292", "#F48FB1", "#F8BBD0", "#FB8C00", "#FFCC80"],
+        ["Deep Sea", "#001219", "#003049", "#D62828", "#F77F00", "#FCBF49"],
+        ["Emerald", "#004B23", "#006400", "#007200", "#008000", "#38B000"]
+    ];
+
+    function init() {
+        const g = document.getElementById('pGrid');
+        pals.forEach((p, idx) => {
+            const d = document.createElement('div'); d.className = 'palette-card'; d.id = 'pc-'+idx;
+            d.onclick = () => d.classList.toggle('selected');
+            d.innerHTML = `<b>${p[0]}</b><div class="swatch-container">${p.slice(1).map(c=>`<div class="swatch" style="background:${c}"></div>`).join('')}</div>`;
+            g.appendChild(d);
+        });
+    }
+    init();
+
+    function tgl(e) { e.classList.toggle('selected'); }
+
+    function hdlImg(i, p) {
+        const f = i.files[0];
+        if(f){
+            const r = new FileReader();
+            r.onload = e => { const img = document.querySelector(`#${p} img`); img.src = e.target.result; img.style.display = 'block'; };
+            r.readAsDataURL(f);
+        }
+    }
+
+    function mv(d) {
+        if (curr === 1 && d === 1) {
+            if(!document.getElementById('clientName').value || !document.getElementById('clientEmail').value) {
+                document.getElementById('idError').style.display = 'block'; return;
+            }
+        }
+        document.getElementById('idError').style.display = 'none';
+        document.getElementById('s' + curr).classList.remove('active');
+        curr += d;
+        document.getElementById('s' + curr).classList.add('active');
+        document.getElementById('btnB').style.display = curr > 1 ? 'inline-block' : 'none';
+        document.getElementById('btnN').style.display = curr < 15 ? 'inline-block' : 'none';
+        document.getElementById('btnD').style.display = curr === 15 ? 'inline-block' : 'none';
+        document.getElementById('stepCounter').innerText = `Step ${curr} / 15`;
+    }
+
+    async function genPNG() {
+        document.getElementById('outN').innerText = document.getElementById('clientName').value;
+        document.getElementById('outD').innerText = new Date().toLocaleDateString();
+        const res = document.getElementById('outRes'); const imgB = document.getElementById('outImgs');
+        res.innerHTML = ""; imgB.innerHTML = "";
+
+        for(let i=2; i<=13; i++) {
+            let sel = Array.from(document.querySelectorAll(`#s${i} .option.selected`)).map(o => o.innerText).join(', ');
+            let extra = document.getElementById('c'+i)?.value;
+            if(sel || extra) res.innerHTML += `<div class="res-row"><b>Step ${i}:</b> ${sel || 'None'} ${extra ? ' | Note: '+extra : ''}</div>`;
+        }
+
+        // Fix: Render selected palettes with actual color swatches in the PNG
+        document.querySelectorAll('.palette-card.selected').forEach(p => {
+            const name = p.querySelector('b').innerText;
+            const colors = Array.from(p.querySelectorAll('.swatch')).map(s => s.style.backgroundColor);
+            let paletteRow = `<div class="res-row" style="display:flex; align-items:center;"><b>Palette: ${name}</b> &nbsp; `;
+            paletteRow += `<div style="display:flex; width:150px; height:25px; border-radius:4px; overflow:hidden; border:1px solid #333;">`;
+            colors.forEach(c => { paletteRow += `<div style="flex:1; background:${c}"></div>`; });
+            paletteRow += `</div> &nbsp; ${document.getElementById('c14').value ? '| '+document.getElementById('c14').value : ''}</div>`;
+            res.innerHTML += paletteRow;
+        });
+
+        for(let i=1; i<=3; i++) {
+            const src = document.querySelector(`#pv${i} img`).src;
+            if(src) {
+                const im = document.createElement('img'); im.src = src;
+                im.style.width = "300px"; im.style.border = "3px solid #58a6ff"; im.style.borderRadius = "10px";
+                imgB.appendChild(im);
+            }
+        }
+        const canvas = await html2canvas(document.querySelector("#export-area"), { useCORS: true });
+        const link = document.createElement('a'); link.download = `Brief_${document.getElementById('clientName').value}.png`;
+        link.href = canvas.toDataURL(); link.click();
+    }
+</script>
+</body>
+</html>
